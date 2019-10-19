@@ -26,7 +26,7 @@ def outputs(pins, vals):
         GPIO.output(pins[i], vals[i])
 
 def set_speed(motor, speed):
-    GPIO.output(motor.pwn_pin, 1)
+    GPIO.output(motor.pwm_pin, 1)
     if -1 <= speed < -0.5:
         GPIO.output(motor.pin1, 0)
         GPIO.output(motor.pin0, 1)
@@ -38,13 +38,18 @@ def set_speed(motor, speed):
         GPIO.output(motor.pin0, 0)
 
 def callback(data):
-    speed = data.linear.z
-    direction = clamp(-1, data.angular.y, 1) * pi/2 + pi/2
-    set_speed(0, normclamp(2*cos(direction)+1)*speed)
-    set_speed(1, normclamp(-2*cos(direction)+1)*speed)
+    if data.linear.x > 0:
+	speed = 1
+    elif data.linear.x < 0:
+        speed = -1
+    else:
+        speed = 0
+    direction = clamp(-1, data.angular.z, 1) * pi/2 + pi/2
+    set_speed(motor_left, normclamp(2*cos(direction)+1)*speed)
+    set_speed(motor_right, normclamp(-2*cos(direction)+1)*speed)
 
 def listener():
-    GPIO.setmode(GPIO.BCM)
+    GPIO.setmode(GPIO.BOARD)
     GPIO.setup(motor_left, GPIO.OUT, initial=GPIO.LOW)
     GPIO.setup(motor_right, GPIO.OUT, initial=GPIO.LOW)
 
