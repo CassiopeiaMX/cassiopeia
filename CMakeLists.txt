@@ -12,5 +12,5 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(talker src/camera_driver.cpp)
-target_link_libraries(talker $(catkin_LIBRARIES))
+add_executable(camera_driver src/camera_driver.cpp)
+target_link_libraries(camera_driver ${catkin_LIBRARIES})
