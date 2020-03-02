@@ -1,0 +1,1 @@
+gst-launch-1.0 udpsrc port=6000 ! application/x-rtp,encoding-name=H265,payload=192 ! rtph265depay ! h265parse ! queue ! avdec_h265 ! d3dvideosink sync=false async=false -e
