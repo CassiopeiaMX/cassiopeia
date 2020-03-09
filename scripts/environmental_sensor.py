@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
+import sys
+
 import adafruit_bme280
 import board
 import busio
+
+print(sys.version)
 
 i2c = busio.I2C(board.SCL, board.SDA)
 bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
