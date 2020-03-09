@@ -1,18 +1,11 @@
 #!/usr/bin/env python
 
 import rospy
-from bme280 import BME280
 from sensor_msgs.msg import FluidPressure
 from sensor_msgs.msg import RelativeHumidity
 from sensor_msgs.msg import Temperature
-from smbus import SMBus
 
-bme280 = None
-
-def setup():
-    global bme280
-    bus = SMBus(1)
-    bme280 = BME280(i2c_dev=bus)
+import environmental_sensor
 
 
 def talker():
@@ -22,14 +15,13 @@ def talker():
     rospy.init_node('environmental_sensor', anonymous=False)
     rate = rospy.Rate(2)  # Max rate of BME280 sensor in normal mode in theory is 13.51 Hz
     while not rospy.is_shutdown():
-        humidity_pub.publish(RelativeHumidity(relative_humidity=bme280.get_humidity()))
-        pressure_pub.publish(FluidPressure(fluid_pressure=bme280.get_pressure()))
-        temperature_pub.publish(Temperature(temperature=bme280.get_temperature()))
+        humidity_pub.publish(RelativeHumidity(relative_humidity=environmental_sensor.get_humidity()))
+        pressure_pub.publish(FluidPressure(fluid_pressure=environmental_sensor.get_pressure()))
+        temperature_pub.publish(Temperature(temperature=environmental_sensor.get_temperature()))
         rate.sleep()
 
 
 if __name__ == '__main__':
-    setup()
     try:
         talker()
     except rospy.ROSInterruptException:

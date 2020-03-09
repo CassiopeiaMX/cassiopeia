@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 
-import adafruit_mpu6050
-import board
-import busio
 import rospy
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Vector3
 
-i2c = busio.I2C(board.SCL_1, board.SDA_1)
-mpu = adafruit_mpu6050.MPU6050(i2c)
+import imu
 
 
 def talker():
@@ -16,8 +12,8 @@ def talker():
     rospy.init_node('imu_driver', anonymous=False)
     rate = rospy.Rate(2)
     while not rospy.is_shutdown():
-        angular_acceleration = mpu.gyro
-        linear_acceleration = mpu.acceleration
+        angular_acceleration = imu.get_gyro()
+        linear_acceleration = imu.get_acceleration()
         linear = Vector3(x=linear_acceleration[0],
                          y=linear_acceleration[1],
                          z=linear_acceleration[2])
