@@ -5,15 +5,13 @@ find_package(catkin REQUIRED COMPONENTS
         roscpp
         rospy
         sensor_msgs
+        geometry_msgs
         std_msgs
-        image_transport
-        cv_bridge
 )
-find_package(OpenCV REQUIRED)
 
-include_directories(${catkin_INCLUDE_DIRS})
-include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+)
 
-add_executable(camera_driver src/camera_driver.cpp)
-target_link_libraries(camera_driver ${catkin_LIBRARIES})
-target_link_libraries(camera_driver ${OpenCV_LIBRARIES})
+find_package(catkin REQUIRED COMPONENTS roslaunch)
+roslaunch_add_file_check(launch)

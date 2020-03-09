@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="cassiopeia" name="imu_driver"/>
+    <node pkg="cassiopeia" name="environmental_sensor_driver"/>
+</launch>
