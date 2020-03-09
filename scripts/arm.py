@@ -1,12 +1,13 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 from collections import namedtuple
-import rospy
-from geometry_msgs.msg import Twist
-import busio
+
 import board
+import busio
 import digitalio
+import rospy
 from adafruit_pca9685 import PCA9685
+from geometry_msgs.msg import Twist
 
 Motor = namedtuple("Motor", ["pin0", "pin1", "pwm_channel"])
 arm_motor = None

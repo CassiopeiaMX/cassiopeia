@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
-import rospy
-from geometry_msgs.msg import Quaternion
-from geometry_msgs.msg import Twist
-from adafruit_servokit import ServoKit
+#!/usr/bin/env python
 import board
 import busio
+import rospy
+from adafruit_servokit import ServoKit
+from geometry_msgs.msg import Quaternion
+from geometry_msgs.msg import Twist
 
 pitch_servo_index = 1
 yaw_servo_index = 0

@@ -1,11 +1,12 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import rospy
-from sensor_msgs.msg import RelativeHumidity
+from bme280 import BME280
 from sensor_msgs.msg import FluidPressure
+from sensor_msgs.msg import RelativeHumidity
 from sensor_msgs.msg import Temperature
 from smbus import SMBus
-from bme280 import BME280
+
 bme280 = None
 
 def setup():

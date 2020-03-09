@@ -1,8 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+
+import curses
 
 import rospy
 from geometry_msgs.msg import Quaternion
-import curses
 
 angle = Quaternion()
 angular_velocity = 50

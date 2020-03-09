@@ -1,15 +1,15 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
+import adafruit_mpu6050
+import board
+import busio
 import rospy
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Vector3
 
-import board
-import busio
-import adafruit_mpu6050
-
 i2c = busio.I2C(board.SCL_1, board.SDA_1)
 mpu = adafruit_mpu6050.MPU6050(i2c)
+
 
 def talker():
     pub = rospy.Publisher('cassiopeia/imu/', Twist, queue_size=10)

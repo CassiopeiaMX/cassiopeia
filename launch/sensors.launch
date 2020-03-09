@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="cassiopeia" type="imu_driver.py" name="imu_driver"/>
+    <node pkg="cassiopeia" type="environmental_sensor_driver.py" name="environmental_sensor_driver"/>
+</launch>

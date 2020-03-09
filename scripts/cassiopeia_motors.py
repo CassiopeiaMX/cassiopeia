@@ -1,10 +1,12 @@
 #!/usr/bin/env python
-import rospy
-from geometry_msgs.msg import Twist
+
 from collections import namedtuple
 from math import cos
 from math import pi
+
 import Jetson.GPIO as GPIO
+import rospy
+from geometry_msgs.msg import Twist
 
 Motor = namedtuple("Motor", ["pin0", "pin1", "pwm_pin"])
 motor_left = Motor(pin0=15, pin1=13, pwm_pin=11)
