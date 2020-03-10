@@ -20,7 +20,7 @@ from sensor_value import SensorValue
 from artificial_horizon import ArtificialHorizon
 
 width = 900
-height = 600
+height = 500
 screen = None
 run = True
 
@@ -40,17 +40,10 @@ connection_value.value = 0
 connection_value.y = display_padding_top
 connection_value.x = width - (connection_value.rect.right + display_padding_side)
 
-velocity_value = SensorValue(title="Velocidad", x=connection_value.x,
-                             y=connection_value.rect.bottom + display_padding_top)
-velocity_value.value = 10
-slope_value = SensorValue(title="Inclinacion", x=velocity_value.x,
-                          y=velocity_value.rect.bottom + display_padding_top)
-slope_value.value = 2
+# Not using arm animation
+# arm_animation = ArmAnimation(x=400, y=400)
 
-arm_animation = ArmAnimation(x=400, y=400)
-
-artificial_horizon = ArtificialHorizon(x=300, y=300)
-
+artificial_horizon = ArtificialHorizon(x=connection_value.rect.left, y=pressure_display.rect.top)
 
 joy_id = 1
 joy_pub = None
@@ -86,8 +79,9 @@ def setup():
     rospy.Subscriber('cassiopeia/environmental/pressure', FluidPressure, pressure_callback)
     rospy.Subscriber('cassiopeia/environmental/humidity', RelativeHumidity, humidity_callback)
     rospy.Subscriber('cassiopeia/altitude', Altitude, altitude_callback)
-    rospy.Subscriber('cassiopeia/arm_state/base_angle', Quaternion, base_angle_callback)
-    rospy.Subscriber('cassiopeia/arm_state/shovel_extension', Vector3, shovel_extension_callback)
+    # Not using arm animation
+    # rospy.Subscriber('cassiopeia/arm_state/base_angle', Quaternion, base_angle_callback)
+    # rospy.Subscriber('cassiopeia/arm_state/shovel_extension', Vector3, shovel_extension_callback)
     rospy.Subscriber('cassiopeia/connection_strength', Int32, connection_strength_callback)
 
     joy_pub = rospy.Publisher('cassiopeia/input/joy', Joy, queue_size=1)
@@ -101,10 +95,10 @@ def draw():
     altitude_display.draw(screen)
     humidity_display.draw(screen)
     connection_value.draw(screen)
-    velocity_value.draw(screen)
-    slope_value.draw(screen)
-    arm_animation.draw(screen)
     artificial_horizon.draw(screen)
+    # Not using arm animation
+    # velocity_value.draw(screen)
+    # arm_animation.draw(screen)
     pygame.display.flip()
 
 
@@ -155,14 +149,6 @@ def humidity_callback(msg):
 
 def altitude_callback(msg):
     altitude_display.update_value(msg.altitude, time.time())
-
-
-def base_angle_callback(msg):
-    pass
-
-
-def shovel_extension_callback(msg):
-    pass
 
 
 def connection_strength_callback(msg):
