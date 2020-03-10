@@ -17,7 +17,7 @@ def talker():
     altitude_pub = rospy.Publisher('cassiopeia/altitude/', Altitude, queue_size=10)
     rospy.init_node('environmental_sensor', anonymous=False)
     rate = rospy.Rate(2)  # Max rate of BME280 sensor in normal mode in theory is 13.51 Hz
-    while not rospy.is_shutdown():
+    while not rospy.is_shutdown():  
         h = Header()
         h.stamp = rospy.Time.now()
         humidity_pub.publish(RelativeHumidity(relative_humidity=environmental_sensor.get_humidity(), header=h))

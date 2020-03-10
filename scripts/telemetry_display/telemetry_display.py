@@ -2,6 +2,7 @@
 
 import pygame
 import rospy
+import time
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Vector3
 from pygame.locals import *
@@ -9,10 +10,13 @@ from sensor_msgs.msg import FluidPressure
 from sensor_msgs.msg import Imu
 from sensor_msgs.msg import RelativeHumidity
 from sensor_msgs.msg import Temperature
+from std_msgs.msg import Int32
+from cassiopeia.msg import Altitude
 
 from arm_animation import ArmAnimation
 from sensor_display import SensorDisplay
 from sensor_value import SensorValue
+from artificial_horizon import ArtificialHorizon
 
 width = 900
 height = 600
@@ -31,7 +35,7 @@ humidity_display = SensorDisplay(title="Humedad", x=display_padding_side,
                                  y=altitude_display.rect.bottom + display_padding_top)
 
 connection_value = SensorValue(title="Coneccion")
-connection_value.value = 100
+connection_value.value = 0
 connection_value.y = display_padding_top
 connection_value.x = width - (connection_value.rect.right + display_padding_side)
 
@@ -43,6 +47,8 @@ slope_value = SensorValue(title="Inclinacion", x=velocity_value.x,
 slope_value.value = 2
 
 arm_animation = ArmAnimation(x=400, y=400)
+
+artificial_horizon = ArtificialHorizon(x=300, y=300)
 
 
 def main():
@@ -58,7 +64,6 @@ def main():
 
 def setup():
     global screen
-    global clock
 
     pygame.init()
     screen = pygame.display.set_mode((width, height))
@@ -74,9 +79,10 @@ def setup():
     rospy.Subscriber('cassiopeia/environmental/temperature', Temperature, temperature_callback)
     rospy.Subscriber('cassiopeia/environmental/pressure', FluidPressure, pressure_callback)
     rospy.Subscriber('cassiopeia/environmental/humidity', RelativeHumidity, humidity_callback)
-    rospy.Subscriber('cassiopeia/environmental/altitude/value', )
+    rospy.Subscriber('cassiopeia/altitude', Altitude, altitude_callback)
     rospy.Subscriber('cassiopeia/arm_state/base_angle', Quaternion, base_angle_callback)
     rospy.Subscriber('cassiopeia/arm_state/shovel_extension', Vector3, shovel_extension_callback)
+    rospy.Subscriber('cassiopeia/connection_strength', Int32, connection_strength_callback)
 
     rospy.init_node('cassiopeia_telemetry_display', anonymous=False)
 
@@ -90,6 +96,7 @@ def draw():
     velocity_value.draw(screen)
     slope_value.draw(screen)
     arm_animation.draw(screen)
+    artificial_horizon.draw(screen)
     pygame.display.flip()
 
 
@@ -98,19 +105,24 @@ def loop():
 
 
 def imu_callback(msg):
-    pass
+    artificial_horizon.roll = msg.orientation.x
+    artificial_horizon.pitch = msg.orientation.y
 
 
 def temperature_callback(msg):
-    temperature_display.update_value(msg.temperature, msg.header.stamp.secs)
+    temperature_display.update_value(msg.temperature, time.time())
 
 
 def pressure_callback(msg):
-    pressure_display.update_value(msg.fluid_pressure, msg.header.stamp.secs)
+    pressure_display.update_value(msg.fluid_pressure, time.time())
 
 
 def humidity_callback(msg):
-    humidity_display.update_value(msg.relative_humidity, msg.header.stamp.secs)
+    humidity_display.update_value(msg.relative_humidity, time.time())
+
+
+def altitude_callback(msg):
+    altitude_display.update_value(msg.altitude, time.time())
 
 
 def base_angle_callback(msg):
@@ -119,6 +131,10 @@ def base_angle_callback(msg):
 
 def shovel_extension_callback(msg):
     pass
+
+
+def connection_strength_callback(msg):
+    connection_value.value = msg.data
 
 
 def event_handler(event):
