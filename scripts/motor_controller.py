@@ -9,8 +9,10 @@ from motor import Motor
 
 
 #TODO set motor pins
-motor_left = Motor(pin1=x, pin2=x, pwm_channel=x)
-motor_right = Motor(pin1=x, pin2=x, pwm_channel=x)
+motor_left = Motor(dir_pin=x pwm_channel=x)
+motor_right = Motor(dir_pin=x, pwm_channel=x)
+motor_shovel = Motor(dir_pin=x, pwm_channel=x)
+motor_arm = Motor(dir_pin=x, pwm_channel=x)
 
 
 def r_of_angle(a):
@@ -47,12 +49,9 @@ def callback(data):
 
 def listener():
     rospy.init_node('cassiopeia_motors')
-
-    rospy.Subscriber('cassiopeia/motors_control', Joy, callback)
-
+    rospy.Subscriber('cassiopeia/input/joy', Joy, callback)
     rospy.spin()
 
 
 if __name__ == '__main__':
     listener()
-    GPIO.cleanup()

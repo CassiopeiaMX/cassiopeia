@@ -18,17 +18,14 @@ def clamp(val, lower, upper):
     return val
 
 
-class Motor:
-    def __init__(self, pin1, pin2, pwm_channel, pca=kit, initial_throttle=0):
-        self._pin1 = digitalio.DigitalInOut(pin1)
-        self._pin2 = digitalio.DigitalInOut(pin2)
-        self._pin1.direction = digitalio.Direction.OUTPUT
-        self._pin2.direction = digitalio.Direction.OUTPUT
+class Motor(object):
+    def __init__(self, dir_pin, pwm_channel, pca=kit, initial_throttle=0):
+        self._dir_pin = digitalio.DigitalInOut(dir_pin)
+        self._dir_pin.direction = digitalio.Direction.OUTPUT
 
         self._pwm_channel = pwm_channel
         self._pca = pca
 
-        self._throttle = initial_throttle
         self.throttle = initial_throttle
 
     @property
@@ -38,15 +35,8 @@ class Motor:
     @throttle.setter
     def throttle(self, value):
         self._throttle = value
-        if self.throttle == 0:
-            self._pin1.value = False
-            self._pin2.value = False
         if self.throttle >= 0:
-            self._pin1.value = True
-            self._pin2.value = False
-        if self.throttle <= 0:
-            self._pin1.value = False
-            self._pin2.value = True
-        if self._pca is None:
-            return
+            self._dir_pin.value = True
+        else:
+            self._dir_pin.value = False
         self._pca[self._pwm_channel].duty_cycle = clamp(int(abs(value)), -1, 1) * 65535
