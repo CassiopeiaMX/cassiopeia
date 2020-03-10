@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 
 import digitalio
+import board
+import busio
+from adafruit_servokit import ServoKit
+
+
+i2c_bus = busio.I2C(board.SCL, board.SDA)
+kit = ServoKit(channels=16, i2c=i2c_bus)
 
 
 def clamp(val, lower, upper):
@@ -12,7 +19,7 @@ def clamp(val, lower, upper):
 
 
 class Motor:
-    def __init__(self, pin1, pin2, pwm_channel, pca=None, initial_throttle=0):
+    def __init__(self, pin1, pin2, pwm_channel, pca=kit, initial_throttle=0):
         self._pin1 = digitalio.DigitalInOut(pin1)
         self._pin2 = digitalio.DigitalInOut(pin2)
         self._pin1.direction = digitalio.Direction.OUTPUT
