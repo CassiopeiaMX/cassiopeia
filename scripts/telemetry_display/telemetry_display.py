@@ -11,6 +11,7 @@ from sensor_msgs.msg import Imu
 from sensor_msgs.msg import RelativeHumidity
 from sensor_msgs.msg import Temperature
 from std_msgs.msg import Int32
+from sensor_msgs.msg import Joy
 from cassiopeia.msg import Altitude
 
 from arm_animation import ArmAnimation
@@ -51,6 +52,10 @@ arm_animation = ArmAnimation(x=400, y=400)
 artificial_horizon = ArtificialHorizon(x=300, y=300)
 
 
+joy_id = 1
+joy_pub = None
+
+
 def main():
     setup()
     clock = pygame.time.Clock()
@@ -64,6 +69,7 @@ def main():
 
 def setup():
     global screen
+    global joy_pub
 
     pygame.init()
     screen = pygame.display.set_mode((width, height))
@@ -84,6 +90,8 @@ def setup():
     rospy.Subscriber('cassiopeia/arm_state/shovel_extension', Vector3, shovel_extension_callback)
     rospy.Subscriber('cassiopeia/connection_strength', Int32, connection_strength_callback)
 
+    joy_pub = rospy.Publisher('cassiopeia/input/joy', Joy, queue_size=1)
+
     rospy.init_node('cassiopeia_telemetry_display', anonymous=False)
 
 
@@ -100,8 +108,32 @@ def draw():
     pygame.display.flip()
 
 
+def jox_x():
+    pass
+
+
+def wiimote_handler():
+    joystick = pygame.joystick.Joystick(joy_id)
+    joystick.init()
+
+    joy_x = joystick.get_axis(0)
+    joy_y = joystick.get_axis(1)
+
+    joy_0 = joystick.get_button(0)
+    joy_1 = joystick.get_button(1)
+    joy_2 = joystick.get_button(2)
+    joy_3 = joystick.get_button(3)
+
+    joy_buttons = [joy_0, joy_1, joy_2, joy_3]
+    joy_axes = [joy_x, joy_y]
+
+    joy_msg = Joy(axes=joy_axes, buttons=joy_buttons)
+    joy_pub.publish(joy_msg)
+
+
 def loop():
     draw()
+    wiimote_handler()
 
 
 def imu_callback(msg):
@@ -138,7 +170,7 @@ def connection_strength_callback(msg):
 
 
 def event_handler(event):
-    if event.type == QUIT:
+    if event.type == pygame.QUIT:
         global run
         run = False
 
