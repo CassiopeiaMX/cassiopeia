@@ -52,7 +52,7 @@ def joy_callback(data):
     pitch = pitch_servo.angle
     pitch = pitch + twist_speed * (data.buttons[4] - data.buttons[5])
     yaw = yaw_servo.angle
-    yaw = yaw + twist_speed * (data.buttons[6] - data.buttons[7])
+    yaw = yaw + twist_speed * (data.buttons[7] - data.buttons[6])
     update_servos(yaw=yaw, pitch=pitch)
 
 
