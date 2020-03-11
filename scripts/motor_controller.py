@@ -68,23 +68,23 @@ def callback(data):
     tx = tx.encode(encoding='ascii')
 
     if ser.is_open:
+        rospy.logdebug("Writing {} to {}".format(tx, ser.port))
         ser.write(tx)
 
 
 def listener():
+    rospy.init_node('cassiopeia_motors')
     connected = False
     reconnect_time = 5
     while not connected:
         try:
-            print("Opening port {}".format(ser.port))
+            rospy.loginfo("Opening port {}".format(ser.port))
             ser.open()
-            print("Done!")
+            rospy.loginfo("Done!")
             connected = True
         except SerialException:
-            print("Could not open {}. Trying again in {} seconds.".format(ser.port, reconnect_time))
+            rospy.loginfo("Could not open {}. Trying again in {} seconds.".format(ser.port, reconnect_time))
             time.sleep(reconnect_time)
-
-    rospy.init_node('cassiopeia_motors')
     rospy.Subscriber('cassiopeia/input/joy', Joy, callback)
     rospy.spin()
 

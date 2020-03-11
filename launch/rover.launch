@@ -4,6 +4,6 @@
     <node name="camera_controller" pkg="cassiopeia" type="camera_control.py" />
     <node name="motor_controller" pkg="cassiopeia" type="motor_controller.py" />
     <node pkg="cassiopeia" type="imu_node.py" name="imu_driver" />
-    <node pkg="cassiopeia" type="environmental_sensor_node.py" name="environmental_sensor_driver" />
+    <!-- node pkg="cassiopeia" type="environmental_sensor_node.py" name="environmental_sensor_driver" / -->
     <node pkg="cassiopeia" type="connection_strength_pub.py" name="connection_strength_pub" />
 </launch>
