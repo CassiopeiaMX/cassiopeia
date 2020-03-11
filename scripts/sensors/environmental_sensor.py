@@ -9,7 +9,7 @@ import board
 import busio
 
 i2c = busio.I2C(board.SCL_1, board.SDA_1)
-bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c, address=0x76)
 
 # change this to match the location's pressure (hPa) at sea level
 bme280.sea_level_pressure = 1018
