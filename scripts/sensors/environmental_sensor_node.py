@@ -11,10 +11,10 @@ from cassiopeia.msg import Altitude
 
 
 def talker():
-    humidity_pub = rospy.Publisher('cassiopeia/environmental/humidity', RelativeHumidity, queue_size=1)
-    temperature_pub = rospy.Publisher('cassiopeia/environmental/temperature', Temperature, queue_size=1)
-    pressure_pub = rospy.Publisher('cassiopeia/environmental/pressure', FluidPressure, queue_size=1)
-    altitude_pub = rospy.Publisher('cassiopeia/altitude/', Altitude, queue_size=1)
+    humidity_pub = rospy.Publisher('cassiopeia/environmental/humidity', RelativeHumidity, queue_size=10)
+    temperature_pub = rospy.Publisher('cassiopeia/environmental/temperature', Temperature, queue_size=10)
+    pressure_pub = rospy.Publisher('cassiopeia/environmental/pressure', FluidPressure, queue_size=10)
+    altitude_pub = rospy.Publisher('cassiopeia/altitude/', Altitude, queue_size=10)
     rospy.init_node('environmental_sensor', anonymous=False)
     rate = rospy.Rate(1)  # Max rate of BME280 sensor in normal mode in theory is 13.51 Hz
     while not rospy.is_shutdown():  

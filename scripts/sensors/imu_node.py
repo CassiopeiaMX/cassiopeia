@@ -14,7 +14,7 @@ def timer_callback(event):
 
 
 def talker():
-    pub = rospy.Publisher('cassiopeia/imu/', Imu, queue_size=1)
+    pub = rospy.Publisher('cassiopeia/imu/', Imu, queue_size=10)
     rospy.init_node('imu_node', anonymous=False)
     rate = rospy.Rate(1)
     rospy.Timer(rospy.Duration(imu.get_delta_t()), timer_callback)
