@@ -1,0 +1,4 @@
+<launch>
+    <node name="telemtry_display" pkg="cassiopeia" type="telemetry_display.py" />
+    <node name="video_receiver" pkg="cassiopeia" type="vp8client.sh" />
+</launch>

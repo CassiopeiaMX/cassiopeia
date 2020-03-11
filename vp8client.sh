@@ -1,6 +1,7 @@
-gst-launch-1.0 udpsrc port=6000 ! \
+#!/bin/bash
+gst-launch-1.0 udpsrc port=5000 ! \
   application/x-rtp,encoding-name=VP8,payload=96 ! \
   rtpvp8depay ! \
   queue ! \
   avdec_vp8 ! \
-  glimagesink sync=false async=false
+  xvimagesink sync=false async=false
