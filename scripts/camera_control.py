@@ -16,11 +16,16 @@ pitch_max = 170
 yaw_min = 0
 yaw_max = 180
 
-twist_speed = 5.0
+twist_speed = 90.0  # degrees per second
 
 pitch_servo = None
 yaw_servo = None
 
+rate = 40.0
+delta_t = 1.0 / rate
+
+pitch_inertia = 0
+yaw_inertia = 0
 
 def clamp(val, minimum, maximum):
     if val > maximum:
@@ -49,17 +54,17 @@ def twist_callback(data):
 
 
 def joy_callback(data):
-    pitch = pitch_servo.angle
-    pitch = pitch + twist_speed * (data.buttons[4] - data.buttons[5])
-    yaw = yaw_servo.angle
-    yaw = yaw + twist_speed * (data.buttons[7] - data.buttons[6])
-    update_servos(yaw=yaw, pitch=pitch)
+    global pitch_inertia
+    global yaw_inertia
+    pitch_inertia = twist_speed * (data.buttons[4] - data.buttons[5])
+    yaw_inertia = twist_speed * (data.buttons[7] - data.buttons[6])
+    print(yaw_inertia)
+    print(pitch_inertia)
 
 
 def update_servos(yaw, pitch):
     global pitch_servo
     global yaw_servo
-    print(yaw)
     yaw_servo.angle = clamp(yaw, yaw_min, yaw_max)
     pitch_servo.angle = clamp(pitch, pitch_min, pitch_max)
 
@@ -69,7 +74,12 @@ def listener():
     rospy.Subscriber('cassiopeia/camera_control/twist', Twist, twist_callback, queue_size=1)
     rospy.Subscriber('cassiopeia/input/joy', Joy, joy_callback, queue_size=1)
     rospy.init_node('camera_control')
-    rospy.spin()
+    ros_rate = rospy.Rate(rate)
+    while not rospy.is_shutdown():
+        yaw = yaw_servo.angle + yaw_inertia * delta_t
+        pitch = pitch_servo.angle + pitch_inertia * delta_t
+        update_servos(yaw=yaw, pitch=pitch)
+        ros_rate.sleep()
 
 
 if __name__ == '__main__':

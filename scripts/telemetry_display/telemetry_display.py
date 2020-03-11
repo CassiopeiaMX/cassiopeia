@@ -52,6 +52,8 @@ artificial_horizon = ArtificialHorizon(x=connection_value.rect.left, y=pressure_
 
 joy_id = 1
 joy_pub = None
+past_joy_axes = None
+past_jot_buttons = None
 
 
 def main():
@@ -130,6 +132,14 @@ def wiimote_handler():
         joy_buttons.append(joy_button)
 
     joy_axes = [joy_x, joy_y]
+
+    if joy_axes == past_joy_axes and joy_buttons == past_jot_buttons:
+        return
+    else:
+        global past_jot_buttons
+        global past_joy_axes
+        past_jot_buttons = joy_buttons
+        past_joy_axes = joy_axes
 
     joy_msg = Joy(axes=joy_axes, buttons=joy_buttons)
     joy_pub.publish(joy_msg)
