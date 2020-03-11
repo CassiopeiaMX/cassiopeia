@@ -102,10 +102,6 @@ def draw():
     pygame.display.flip()
 
 
-def jox_x():
-    pass
-
-
 def wiimote_handler():
     joystick = pygame.joystick.Joystick(joy_id)
     joystick.init()
@@ -113,12 +109,11 @@ def wiimote_handler():
     joy_x = joystick.get_axis(0)
     joy_y = joystick.get_axis(1)
 
-    joy_0 = joystick.get_button(0)
-    joy_1 = joystick.get_button(1)
-    joy_2 = joystick.get_button(2)
-    joy_3 = joystick.get_button(3)
+    joy_buttons = list()
+    for i in range(0, 8):
+        joy_button = joystick.get_button(i)
+        joy_buttons.append(joy_button)
 
-    joy_buttons = [joy_0, joy_1, joy_2, joy_3]
     joy_axes = [joy_x, joy_y]
 
     joy_msg = Joy(axes=joy_axes, buttons=joy_buttons)

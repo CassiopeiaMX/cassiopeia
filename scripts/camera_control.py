@@ -1,11 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import board
 import busio
-import rospy
 from adafruit_servokit import ServoKit
+import rospy
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Joy
 
 pitch_servo_index = 1
 yaw_servo_index = 0
@@ -32,8 +33,8 @@ def clamp(val, minimum, maximum):
 def setup():
     global pitch_servo
     global yaw_servo
-    i2c_bus1 = busio.I2C(board.SCL, board.SDA)
-    kit = ServoKit(channels=16, i2c=i2c_bus1)
+    i2c_bus = busio.I2C(board.SCL, board.SDA)
+    kit = ServoKit(channels=16, i2c=i2c_bus)
     pitch_servo = kit.servo[pitch_servo_index]
     yaw_servo = kit.servo[yaw_servo_index]
     update_servos(90, 90)
@@ -47,9 +48,18 @@ def twist_callback(data):
     update_servos(yaw=yaw_servo.angle+twist_speed*data.angular.z, pitch=pitch_servo.angle+twist_speed*data.linear.x)
 
 
+def joy_callback(data):
+    pitch = pitch_servo.angle
+    pitch = pitch + twist_speed * (data.buttons[4] - data.buttons[5])
+    yaw = yaw_servo.angle
+    yaw = yaw + twist_speed * (data.buttons[6] - data.buttons[7])
+    update_servos(yaw=yaw, pitch=pitch)
+
+
 def update_servos(yaw, pitch):
     global pitch_servo
     global yaw_servo
+    print(yaw)
     yaw_servo.angle = clamp(yaw, yaw_min, yaw_max)
     pitch_servo.angle = clamp(pitch, pitch_min, pitch_max)
 
@@ -57,6 +67,7 @@ def update_servos(yaw, pitch):
 def listener():
     rospy.Subscriber('cassiopeia/camera_control/absolute', Quaternion, absolute_callback, queue_size=1)
     rospy.Subscriber('cassiopeia/camera_control/twist', Twist, twist_callback, queue_size=1)
+    rospy.Subscriber('cassiopeia/input/joy', Joy, joy_callback, queue_size=1)
     rospy.init_node('camera_control')
     rospy.spin()
 

@@ -3,5 +3,4 @@ gst-launch-1.0 udpsrc port=6000 ! \
   rtpvp8depay ! \
   queue ! \
   avdec_vp8 ! \
-  videoconvert ! \
-  ximagesink sync=false async=false
+  glimagesink sync=false async=false

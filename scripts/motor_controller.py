@@ -46,6 +46,9 @@ def callback(data):
     motor_left.throttle = r * l_of_angle(a)
     motor_right.throttle = r * r_of_angle(a)
 
+    motor_arm.throttle = data.buttons[0] - data.buttons[1]
+    motor_shovel.throttle = data.buttons[2] - data.buttons[3]
+
 
 def listener():
     rospy.init_node('cassiopeia_motors')
