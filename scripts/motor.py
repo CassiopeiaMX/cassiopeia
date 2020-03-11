@@ -1,32 +1,15 @@
 #!/usr/bin/env python
 
 import digitalio
-import board
-import busio
-from adafruit_servokit import ServoKit
-
-
-i2c_bus = busio.I2C(board.SCL, board.SDA)
-kit = ServoKit(channels=16, i2c=i2c_bus)
-
-
-def clamp(val, lower, upper):
-    if val > upper:
-        return upper
-    if val < lower:
-        return lower
-    return val
-
 
 class Motor(object):
-    def __init__(self, dir_pin, pwm_channel, pca=kit, initial_throttle=0):
+    def __init__(self, dir_pin, pwm_pin, initial_throttle=0):
         self._dir_pin = digitalio.DigitalInOut(dir_pin)
+        self._pwm_pin = digitalio.DigitalInOut(pwm_pin)
         self._dir_pin.direction = digitalio.Direction.OUTPUT
-
-        self._pwm_channel = pwm_channel
-        self._pca = pca
-
+        self._pwm_pin.direction = digitalio.Direction.OUTPUT
         self.throttle = initial_throttle
+
 
     @property
     def throttle(self):
@@ -35,8 +18,13 @@ class Motor(object):
     @throttle.setter
     def throttle(self, value):
         self._throttle = value
-        if self.throttle >= 0:
-            self._dir_pin.value = True
-        else:
+        deadzone = 0.1
+        if abs(self._throttle) <= deadzone:
             self._dir_pin.value = False
-        self._pca[self._pwm_channel].duty_cycle = clamp(int(abs(value)), -1, 1) * 65535
+            self._pwm_pin.value = False
+        if self._throttle > deadzone:
+            self._dir_pin.value = True
+            self._pwm_pin.value = True
+        if self._throttle < -deadzone:
+            self._dir_pin.value = False
+            self._pwm_pin.value = True
