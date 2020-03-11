@@ -12,7 +12,9 @@ def talker():
         process = Popen(["nmcli", "dev", "wifi"], stdout=PIPE)
         stdout = process.communicate()
         a = stdout[0].split()
-        connection_strength = int(a[14])
+        i = a.index("CASSIOPEIA-BASE")
+        i += 5
+        connection_strength = int(a[i])
         msg = Int32(data=connection_strength)
         connection_strength_pub.publish(msg)
         rate.sleep()
