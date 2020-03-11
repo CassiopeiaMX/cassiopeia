@@ -19,6 +19,11 @@ from sensor_display import SensorDisplay
 from sensor_value import SensorValue
 from artificial_horizon import ArtificialHorizon
 
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+YELLOW = (200, 200, 0)
+
 width = 900
 height = 500
 screen = None
@@ -35,8 +40,8 @@ altitude_display = SensorDisplay(title="Altitud", x=display_padding_side,
 humidity_display = SensorDisplay(title="Humedad", x=display_padding_side,
                                  y=altitude_display.rect.bottom + display_padding_top)
 
-connection_value = SensorValue(title="Coneccion")
-connection_value.value = 0
+connection_value = SensorValue(title="Coneccion", value_format="{0:.0f}")
+connection_value.value = 100
 connection_value.y = display_padding_top
 connection_value.x = width - (connection_value.rect.right + display_padding_side)
 
@@ -94,7 +99,17 @@ def draw():
     pressure_display.draw(screen)
     altitude_display.draw(screen)
     humidity_display.draw(screen)
+
+    connection_strength = connection_value.value
+    if connection_strength >= 80:
+        connection_value._value_text._color = GREEN
+    if 30 <= connection_strength < 80:
+        connection_value._value_text._color = YELLOW
+    if connection_value < 30:
+        connection_value._value_text._color = RED
+
     connection_value.draw(screen)
+
     artificial_horizon.draw(screen)
     # Not using arm animation
     # velocity_value.draw(screen)
