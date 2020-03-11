@@ -5,7 +5,7 @@ import rospy
 from std_msgs.msg import Int32
 
 def talker():
-    connection_strength_pub = rospy.Publisher('cassiopeia/connection_strength', Int32, queue_size=10)
+    connection_strength_pub = rospy.Publisher('cassiopeia/connection_strength', Int32, queue_size=1)
     rospy.init_node('connection_strength_pub', anonymous=False)
     rate = rospy.Rate(1)
     while not rospy.is_shutdown():
