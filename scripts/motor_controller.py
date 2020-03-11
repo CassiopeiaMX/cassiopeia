@@ -63,7 +63,8 @@ def callback(data):
     tx = "{} \n".format(code)
     tx = tx.encode(encoding='ascii')
 
-    ser.write(tx)
+    if ser.is_open:
+        ser.write(tx)
 
 
 def listener():
