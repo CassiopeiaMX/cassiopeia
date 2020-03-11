@@ -2,4 +2,6 @@
     <env name="ROS_MASTER_URI" value="http://robert-desktop:11311" />
     <node name="video_transmitter" pkg="cassiopeia" type="vp8server.sh" />
     <node name="camera_controller" pkg="cassiopeia" type="camera_control.py" />
+    <node name="motor_controller" pkg="cassiopeia" type="motor_controller.py" />
+    <include file="sensors.launch" />
 </launch>
