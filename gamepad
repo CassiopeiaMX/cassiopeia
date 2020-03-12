@@ -1,0 +1,11 @@
+# gameport
+Wiimote.Up = BTN_5
+Wiimote.Down = BTN_6
+Wiimote.Right = BTN_7
+Wiimote.Left = BTN_8
+Nunchuk.Stick.X = ABS_HAT1X
+Nunchuk.Stick.Y = ABS_HAT1Y
+Wiimote.1 = BTN_1
+Wiimote.2 = BTN_2
+Wiimote.A = BTN_A
+Wiimote.B = BTN_B
