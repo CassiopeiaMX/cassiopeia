@@ -17,6 +17,9 @@ include_directories(
 add_message_files(
     FILES
     Altitude.msg
+    CameraPosition.msg
+    Trit.msg
+    Vector2.msg
 )
 
 generate_messages(

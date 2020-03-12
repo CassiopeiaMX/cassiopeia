@@ -1,6 +1,7 @@
 <launch>
     <env name="ROS_MASTER_URI" value="http://robert-desktop:11311" />
-    <node name="video_transmitter" pkg="cassiopeia" type="vp8server.sh" />
+    <env name="BASE_IP" value="robert-desktop" />
+    <node name="video_transmitter" pkg="cassiopeia" type="h265server.sh" />
     <node name="camera_controller" pkg="cassiopeia" type="camera_control.py" />
     <node name="motor_controller" pkg="cassiopeia" type="motor_controller.py" />
     <node pkg="cassiopeia" type="imu_node.py" name="imu_driver" />

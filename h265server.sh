@@ -4,4 +4,4 @@ gst-launch-1.0 -e nvarguscamerasrc saturation=0 ! \
   nvvidconv flip-method=2 ! \
   nvv4l2h265enc bitrate=160000 ! \
   rtph265pay mtu=1400 ! \
-  udpsink host=robert-desktop port=5000 sync=false async=false
+  udpsink host=$BASE_IP port=5000 sync=false async=false

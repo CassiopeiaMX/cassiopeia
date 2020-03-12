@@ -1,24 +1,34 @@
+#!/usr/bin/env python3
+
 import pygame
-from pygame.joystick import Joystick
+import pygame.joystick
 import rospy
 from cassiopeia.msg import Vector2
 from cassiopeia.msg import CameraPosition
 from cassiopeia.msg import Trit
+
+
+# Configuration
+use_wii_joy = True
+use_dualshock_joy = False
+
+wii_joy_index = 0
+dualshock_joy_index = 0
+
 
 camera_pub = None
 direction_pub = None
 shovel_pub = None
 arm_pub = None
 
-wii_joy_index = 1
-dualshock_joy_index = 2
 wii_joy_detected = True
 dualshock_joy_detected = True
 
 
-past_dir = [0, 0]
+past_dir = (0, 0)
 past_shovel = 0
 past_arm = 0
+past_camera = (0, 0)
 
 
 
@@ -47,10 +57,13 @@ def setup():
     global shovel_pub
     global arm_pub
     pygame.init()
+    pygame.joystick.init()
     camera_pub = rospy.Publisher('cassiopeia/control/camera/absolute', CameraPosition, queue_size=1)
     direction_pub = rospy.Publisher('cassiopeia/control/direction', Vector2, queue_size=1)
     shovel_pub = rospy.Publisher('cassiopeia/control/shovel', Trit, queue_size=1)
     arm_pub = rospy.Publisher('cassiopeia/control/arm', Trit, queue_size=1)
+
+    rospy.init_node('base_input', anonymous=False)
 
 
 def loop():
@@ -58,23 +71,25 @@ def loop():
     global dualshock_joy_detected
     joy_count = pygame.joystick.get_count()
 
-    if wii_joy_index < joy_count - 1:
-        if not wii_joy_detected:
-            rospy.loginfo("Wiimote detected! Joy index: {}".format(wii_joy_index))
-            wii_joy_detected = True
-        wiimote_handler()
-    elif wii_joy_detected:
-        rospy.logwarn("Wiimote not detected. Joy index: {}".format(wii_joy_index))
-        wii_joy_detected = False
+    if use_wii_joy:
+        if wii_joy_index < joy_count - 1:
+            if not wii_joy_detected:
+                rospy.loginfo("Wiimote detected! Joy index: {}".format(wii_joy_index))
+                wii_joy_detected = True
+            wiimote_handler()
+        elif wii_joy_detected:
+            rospy.logwarn("Wiimote not detected. Joy index: {}".format(wii_joy_index))
+            wii_joy_detected = False
 
-    if dualshock_joy_index < joy_count - 1:
-        if not dualshock_joy_detected:
-            rospy.loginfo("Dualshock detected! Joy index: {}".format(dualshock_joy_index))
-            dualshock_joy_detected = True
-        dualshock_handler()
-    elif dualshock_joy_detected:
-        rospy.logwarn("Dualshock not detected. Joy index: {}".format(dualshock_joy_index))
-        dualshock_joy_detected = False
+    if use_dualshock_joy:
+        if dualshock_joy_index < joy_count - 1:
+            if not dualshock_joy_detected:
+                rospy.loginfo("Dualshock detected! Joy index: {}".format(dualshock_joy_index))
+                dualshock_joy_detected = True
+            dualshock_handler()
+        elif dualshock_joy_detected:
+            rospy.logwarn("Dualshock not detected. Joy index: {}".format(dualshock_joy_index))
+            dualshock_joy_detected = False
 
 
 def pub_direction(direction):
@@ -106,6 +121,16 @@ def pub_arm(val):
     past_arm = to_trit(val)
 
 
+def pub_camera(pitch, yaw):
+    global past_camera
+    camera = (pitch, yaw)
+    if camera == past_camera:
+        return
+    msg = CameraPosition(yaw=yaw, pitch=pitch)
+    camera_pub.publish(msg)
+    past_camera = camera
+
+
 def wiimote_handler():
     joystick = Joystick(wii_joy_index)
     joystick.init()
@@ -118,15 +143,22 @@ def wiimote_handler():
         joy_button = joystick.get_button(i)
         joy_buttons.append(joy_button)
 
-    joy_axes = [joy_x, joy_y]
-
-    pub_direction(joy_axes)
+    pub_direction((joy_x, joy_y))
     pub_arm(joy_buttons[5] - joy_buttons[4])
     pub_arm(joy_buttons[7] - joy_buttons[6])
 
 
 def dualshock_handler():
-    pass
+    joystick = Joystick(wii_joy_index)
+    joystick.init()
+
+    joy_x1 = joystick.get_axis(0)
+    joy_y1 = joystick.get_axis(1)
+    joy_x2 = joystick.get_axis(2)
+    joy_y2 = joystick.get_axis(3)
+    axes = [joy_x1, joy_y1, joy_x2, joy_y2]
+    for axis in axes:
+        print(axis)
 
 
 if __name__ == '__main__':
