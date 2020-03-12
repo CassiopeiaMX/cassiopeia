@@ -53,7 +53,7 @@ artificial_horizon = ArtificialHorizon(x=connection_value.rect.left, y=pressure_
 joy_id = 1
 joy_pub = None
 past_joy_axes = None
-past_jot_buttons = None
+past_joy_buttons = None
 
 
 def main():
@@ -86,12 +86,7 @@ def setup():
     rospy.Subscriber('cassiopeia/environmental/pressure', FluidPressure, pressure_callback)
     rospy.Subscriber('cassiopeia/environmental/humidity', RelativeHumidity, humidity_callback)
     rospy.Subscriber('cassiopeia/altitude', Altitude, altitude_callback)
-    # Not using arm animation
-    # rospy.Subscriber('cassiopeia/arm_state/base_angle', Quaternion, base_angle_callback)
-    # rospy.Subscriber('cassiopeia/arm_state/shovel_extension', Vector3, shovel_extension_callback)
     rospy.Subscriber('cassiopeia/connection_strength', Int32, connection_strength_callback)
-
-    joy_pub = rospy.Publisher('cassiopeia/input/joy', Joy, queue_size=1)
 
     rospy.init_node('cassiopeia_telemetry_display', anonymous=False)
 
@@ -104,11 +99,11 @@ def draw():
 
     connection_strength = connection_value.value
     if connection_strength >= 80:
-        connection_value._value_text._color = GREEN
+        connection_value.value_text._color = GREEN
     if 30 <= connection_strength < 80:
-        connection_value._value_text._color = YELLOW
-    if connection_value < 30:
-        connection_value._value_text._color = RED
+        connection_value.value_text._color = YELLOW
+    if connection_strength < 30:
+        connection_value.value_text._color = RED
 
     connection_value.draw(screen)
 
@@ -119,35 +114,8 @@ def draw():
     pygame.display.flip()
 
 
-def wiimote_handler():
-    joystick = pygame.joystick.Joystick(joy_id)
-    joystick.init()
-
-    joy_x = joystick.get_axis(0)
-    joy_y = joystick.get_axis(1)
-
-    joy_buttons = list()
-    for i in range(0, 8):
-        joy_button = joystick.get_button(i)
-        joy_buttons.append(joy_button)
-
-    joy_axes = [joy_x, joy_y]
-
-    if joy_axes == past_joy_axes and joy_buttons == past_jot_buttons:
-        return
-    else:
-        global past_jot_buttons
-        global past_joy_axes
-        past_jot_buttons = joy_buttons
-        past_joy_axes = joy_axes
-
-    joy_msg = Joy(axes=joy_axes, buttons=joy_buttons)
-    joy_pub.publish(joy_msg)
-
-
 def loop():
     draw()
-    wiimote_handler()
 
 
 def imu_callback(msg):

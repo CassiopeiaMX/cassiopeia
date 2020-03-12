@@ -74,3 +74,7 @@ class SensorValue(object):
     @property
     def rect(self):
         return self._rect
+
+    @property
+    def value_text(self):
+        return self._value_text

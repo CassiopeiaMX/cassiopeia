@@ -6,7 +6,7 @@ import serial
 import time
 
 import rospy
-from sensor_msgs.msg import Joy
+from cassiopeia.msg import Vector2
 
 ser = serial.Serial()
 ser.port = '/dev/ttyACM0'

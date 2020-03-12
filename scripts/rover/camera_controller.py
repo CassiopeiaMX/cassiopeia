@@ -67,8 +67,8 @@ def update_servos(yaw, pitch):
 
 
 def listener():
-    rospy.Subscriber('cassiopeia/camera_control/absolute', CameraPosition, absolute_callback, queue_size=1)
-    rospy.Subscriber('cassiopeia/camera_control/twist', CameraTwist, twist_callback, queue_size=1)
+    rospy.Subscriber('cassiopeia/control/camera/absolute', CameraPosition, absolute_callback, queue_size=1)
+    rospy.Subscriber('cassiopeia/control/camera/twist', CameraTwist, twist_callback, queue_size=1)
     rospy.init_node('camera_controller')
     ros_rate = rospy.Rate(rate)
     while not rospy.is_shutdown():
