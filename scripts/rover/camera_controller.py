@@ -4,9 +4,8 @@ import board
 import busio
 from adafruit_servokit import ServoKit
 import rospy
-from geometry_msgs.msg import Quaternion
-from geometry_msgs.msg import Twist
-from sensor_msgs.msg import Joy
+from cassiopeia.msg import CameraTwist
+from cassiopeia.msg import CameraPosition
 
 pitch_servo_index = 1
 yaw_servo_index = 0
@@ -42,24 +41,22 @@ def setup():
     kit = ServoKit(channels=16, i2c=i2c_bus)
     pitch_servo = kit.servo[pitch_servo_index]
     yaw_servo = kit.servo[yaw_servo_index]
-    update_servos(90, 90)
+    update_servos((yaw_max+yaw_min)/2, (pitch_max+pitch_min)/2)
 
 
 def absolute_callback(data):
-    update_servos(yaw=data.z, pitch=data.y)
+    global pitch_inertia
+    global yaw_inertia
+    pitch_inertia = 0
+    yaw_inertia = 0
+    update_servos(yaw=data.yaw, pitch=data.y)
 
 
 def twist_callback(data):
-    update_servos(yaw=yaw_servo.angle+twist_speed*data.angular.z, pitch=pitch_servo.angle+twist_speed*data.linear.x)
-
-
-def joy_callback(data):
     global pitch_inertia
     global yaw_inertia
-    pitch_inertia = twist_speed * (data.buttons[4] - data.buttons[5])
-    yaw_inertia = twist_speed * (data.buttons[7] - data.buttons[6])
-    print(yaw_inertia)
-    print(pitch_inertia)
+    pitch_inertia = twist_speed * data.pitch
+    yaw_inertia = twist_speed * data.yaw
 
 
 def update_servos(yaw, pitch):
@@ -70,10 +67,9 @@ def update_servos(yaw, pitch):
 
 
 def listener():
-    rospy.Subscriber('cassiopeia/camera_control/absolute', Quaternion, absolute_callback, queue_size=1)
-    rospy.Subscriber('cassiopeia/camera_control/twist', Twist, twist_callback, queue_size=1)
-    rospy.Subscriber('cassiopeia/input/joy', Joy, joy_callback, queue_size=1)
-    rospy.init_node('camera_control')
+    rospy.Subscriber('cassiopeia/camera_control/absolute', CameraPosition, absolute_callback, queue_size=1)
+    rospy.Subscriber('cassiopeia/camera_control/twist', CameraTwist, twist_callback, queue_size=1)
+    rospy.init_node('camera_controller')
     ros_rate = rospy.Rate(rate)
     while not rospy.is_shutdown():
         yaw = yaw_servo.angle + yaw_inertia * delta_t
