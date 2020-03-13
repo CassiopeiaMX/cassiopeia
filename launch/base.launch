@@ -1,5 +1,6 @@
 <launch>
     <node name="telemtry_display" pkg="cassiopeia" type="telemetry_display.py" />
     <node name="video_receiver" pkg="cassiopeia" type="vp8client.sh" />
+    <node name="base_input" pkg="cassiopeia" type="base_input.py"/>
     <node pkg="rosbag" type="record" name="record" output="screen" args="-a" />
 </launch>
