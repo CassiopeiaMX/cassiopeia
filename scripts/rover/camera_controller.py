@@ -2,9 +2,8 @@
 
 import board
 import busio
-from adafruit_servokit import ServoKit
 import rospy
-from cassiopeia.msg import CameraTwist
+from adafruit_servokit import ServoKit
 from cassiopeia.msg import CameraPosition
 
 pitch_servo_index = 1
@@ -55,8 +54,8 @@ def absolute_callback(data):
 def twist_callback(data):
     global pitch_inertia
     global yaw_inertia
-    pitch_inertia = twist_speed * data.pitch
-    yaw_inertia = twist_speed * data.yaw
+    pitch_inertia = -twist_speed * data.pitch
+    yaw_inertia = -twist_speed * data.yaw
 
 
 def update_servos(yaw, pitch):
@@ -68,7 +67,7 @@ def update_servos(yaw, pitch):
 
 def listener():
     rospy.Subscriber('cassiopeia/control/camera/absolute', CameraPosition, absolute_callback, queue_size=1)
-    rospy.Subscriber('cassiopeia/control/camera/twist', CameraTwist, twist_callback, queue_size=1)
+    rospy.Subscriber('cassiopeia/control/camera/twist', CameraPosition, twist_callback, queue_size=1)
     rospy.init_node('camera_controller')
     ros_rate = rospy.Rate(rate)
     while not rospy.is_shutdown():
