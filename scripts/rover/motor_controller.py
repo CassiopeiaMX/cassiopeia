@@ -4,6 +4,7 @@ import time
 import rospy
 import serial
 from cassiopeia.msg import Vector2
+from cassiopeia.msg import Trit
 from serial.serialutil import SerialException
 
 ser = serial.Serial()
@@ -12,6 +13,11 @@ ser.baudrate = 9600
 
 ser_update_time = 50 / 1000
 past_code = 99
+
+arm = 0
+shovel = 0
+dir_code = 9
+code = 99
 
 
 def sign(n):
@@ -22,7 +28,9 @@ def sign(n):
     return 0
 
 
-def callback(data):
+def dir_callback(data):
+    global dir_code
+
     x = data.x
     y = data.y
     d = 0.2
@@ -46,26 +54,37 @@ def callback(data):
     if x > d and y < -d:
         mc = 4
 
-    arm_throttle = data.buttons[0] - data.buttons[1]
-    shovel_throttle = data.buttons[2] - data.buttons[3]
+    dir_code = mc
 
+
+def shovel_callback(data):
+    global shovel
+    shovel = -data.negative * data.magnitude
+
+
+def arm_callback(data):
+    global arm
+    arm = -data.negative * data.magnitude
+
+
+def update_code(data):
+    global code
     arm_combinations = [
-        [ 1, 1],
-        [ 1, 0],
-        [ 1,-1],
+        [1, 1],
+        [1, 0],
+        [1, -1],
         [-1, 0],
-        [-1,-1],
-        [ 0,-1],
+        [-1, -1],
+        [0, -1],
         [-1, 1],
         [0, 1],
         [0, 0]
     ]
 
-    comb = [arm_throttle, shovel_throttle]
+    comb = [arm, shovel]
     arm_code = arm_combinations.index(comb) + 1
 
-    code = mc * 10 + arm_code
-
+    code = dir_code * 10 + arm_code
     send_code(code)
 
 
@@ -82,19 +101,21 @@ def send_code(code):
 
 
 def listener():
-    rospy.init_node('cassiopeia_motors')
     connected = False
     reconnect_time = 5
     while not connected:
         try:
-            rospy.loginfo("Opening port {}".format(ser.port))
+            rospy.logwarn("Opening port {}".format(ser.port))
             ser.open()
-            rospy.loginfo("Done!")
+            rospy.logwarn("Done!")
             connected = True
         except SerialException:
-            rospy.loginfo("Could not open {}. Trying again in {} seconds.".format(ser.port, reconnect_time))
+            rospy.logwarn("Could not open {}. Trying again in {} seconds.".format(ser.port, reconnect_time))
             time.sleep(reconnect_time)
-    rospy.Subscriber('cassiopeia/control/direction', Vector2, callback)
+    rospy.Subscriber('cassiopeia/control/direction', Vector2, dir_callback)
+    rospy.Subscriber('cassiopeia/control/arm', Trit, arm_callback)
+    rospy.Subscriber('cassiopeia/control/shovel', Trit, shovel_callback)
+    rospy.init_node('cassiopeia_motors')
     rate = rospy.Rate(1 / ser_update_time)
     while not rospy.is_shutdown():
         rate.sleep()

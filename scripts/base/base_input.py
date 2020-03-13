@@ -13,7 +13,7 @@ from cassiopeia.msg import Trit
 use_wii_joy = True
 use_dualshock_joy = False
 
-wii_joy_index = 0
+wii_joy_index = 1
 dualshock_joy_index = 0
 
 
