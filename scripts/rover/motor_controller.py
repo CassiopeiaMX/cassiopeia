@@ -3,8 +3,8 @@ import time
 
 import rospy
 import serial
-from cassiopeia.msg import Vector2
 from cassiopeia.msg import Trit
+from cassiopeia.msg import Vector2
 from serial.serialutil import SerialException
 
 ser = serial.Serial()
@@ -56,19 +56,22 @@ def dir_callback(data):
 
     dir_code = mc
 
+    update_code()
+
 
 def shovel_callback(data):
     global shovel
     shovel = -data.negative * data.magnitude
+    update_code()
 
 
 def arm_callback(data):
     global arm
     arm = -data.negative * data.magnitude
+    update_code()
 
 
 def update_code(data):
-    global code
     arm_combinations = [
         [1, 1],
         [1, 0],
