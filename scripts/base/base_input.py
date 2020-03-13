@@ -2,6 +2,7 @@
 
 import pygame
 import pygame.joystick
+from pygame.joystick import Joystick
 import rospy
 from cassiopeia.msg import Vector2
 from cassiopeia.msg import CameraPosition
@@ -57,8 +58,7 @@ def setup():
     global shovel_pub
     global arm_pub
     pygame.init()
-    pygame.joystick.init()
-    camera_pub = rospy.Publisher('cassiopeia/control/camera/absolute', CameraPosition, queue_size=1)
+    camera_pub = rospy.Publisher('cassiopeia/control/camera/twist', CameraPosition, queue_size=1)
     direction_pub = rospy.Publisher('cassiopeia/control/direction', Vector2, queue_size=1)
     shovel_pub = rospy.Publisher('cassiopeia/control/shovel', Trit, queue_size=1)
     arm_pub = rospy.Publisher('cassiopeia/control/arm', Trit, queue_size=1)
@@ -67,12 +67,15 @@ def setup():
 
 
 def loop():
+    for event in pygame.event.get():
+        pass
+
     global wii_joy_detected
     global dualshock_joy_detected
     joy_count = pygame.joystick.get_count()
 
     if use_wii_joy:
-        if wii_joy_index < joy_count - 1:
+        if wii_joy_index <= joy_count - 1:
             if not wii_joy_detected:
                 rospy.loginfo("Wiimote detected! Joy index: {}".format(wii_joy_index))
                 wii_joy_detected = True
@@ -82,7 +85,7 @@ def loop():
             wii_joy_detected = False
 
     if use_dualshock_joy:
-        if dualshock_joy_index < joy_count - 1:
+        if dualshock_joy_index <= joy_count - 1:
             if not dualshock_joy_detected:
                 rospy.loginfo("Dualshock detected! Joy index: {}".format(dualshock_joy_index))
                 dualshock_joy_detected = True
@@ -118,6 +121,7 @@ def pub_arm(val):
         return
     msg = to_trit_msg(val)
     arm_pub.publish(msg)
+    print(val)
     past_arm = to_trit(val)
 
 
@@ -132,7 +136,7 @@ def pub_camera(pitch, yaw):
 
 
 def wiimote_handler():
-    joystick = Joystick(wii_joy_index)
+    joystick = pygame.joystick.Joystick(wii_joy_index)
     joystick.init()
 
     joy_x = joystick.get_axis(0)
@@ -144,8 +148,12 @@ def wiimote_handler():
         joy_buttons.append(joy_button)
 
     pub_direction((joy_x, joy_y))
-    pub_arm(joy_buttons[5] - joy_buttons[4])
-    pub_arm(joy_buttons[7] - joy_buttons[6])
+    pub_arm(joy_buttons[0] - joy_buttons[1])
+    pub_shovel(joy_buttons[2] - joy_buttons[3])
+    pitch = joy_buttons[4] - joy_buttons[5]
+    yaw = joy_buttons[6] - joy_buttons[7]
+    pub_camera(pitch, yaw)
+
 
 
 def dualshock_handler():
