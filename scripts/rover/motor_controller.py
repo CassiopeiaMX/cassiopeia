@@ -20,6 +20,14 @@ dir_code = 9
 code = 99
 
 
+def trit_to_int(data):
+    val = 0
+    if data.magnitude:
+        val = 1
+    if data.negative:
+        val = val * -1
+    return val
+
 def sign(n):
     if n > 0:
         return 1
@@ -61,17 +69,18 @@ def dir_callback(data):
 
 def shovel_callback(data):
     global shovel
-    shovel = -data.negative * data.magnitude
+    shovel = trit_to_int(data)
     update_code()
 
 
 def arm_callback(data):
+    print("aaa")
     global arm
-    arm = -data.negative * data.magnitude
+    arm = trit_to_int(data)
     update_code()
 
 
-def update_code(data):
+def update_code():
     arm_combinations = [
         [1, 1],
         [1, 0],
@@ -88,6 +97,7 @@ def update_code(data):
     arm_code = arm_combinations.index(comb) + 1
 
     code = dir_code * 10 + arm_code
+    print(code)
     send_code(code)
 
 
