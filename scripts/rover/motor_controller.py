@@ -10,6 +10,10 @@ ser = serial.Serial()
 ser.port = '/dev/ttyACM0'
 ser.baudrate = 9600
 
+ser_update_time = 50 / 1000
+past_code = 99
+
+
 def sign(n):
     if n > 0:
         return 1
@@ -53,8 +57,8 @@ def callback(data):
         [-1,-1],
         [ 0,-1],
         [-1, 1],
-        [ 0, 1],
-        [ 0, 0]
+        [0, 1],
+        [0, 0]
     ]
 
     comb = [arm_throttle, shovel_throttle]
@@ -62,12 +66,19 @@ def callback(data):
 
     code = mc * 10 + arm_code
 
+    send_code(code)
+
+
+def send_code(code):
+    global past_code
+
     tx = "{} \n".format(code)
     tx = tx.encode(encoding='ascii')
 
     if ser.is_open:
         rospy.logdebug("Writing {} to {}".format(tx, ser.port))
         ser.write(tx)
+        past_code = code
 
 
 def listener():
@@ -84,7 +95,10 @@ def listener():
             rospy.loginfo("Could not open {}. Trying again in {} seconds.".format(ser.port, reconnect_time))
             time.sleep(reconnect_time)
     rospy.Subscriber('cassiopeia/control/direction', Vector2, callback)
-    rospy.spin()
+    rate = rospy.Rate(1 / ser_update_time)
+    while not rospy.is_shutdown():
+        rate.sleep()
+        send_code(past_code)
 
 
 if __name__ == '__main__':
