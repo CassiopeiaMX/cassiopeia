@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-from serial.serialutil import SerialException
-
-import serial
-
 import time
 
 import rospy
+import serial
 from cassiopeia.msg import Vector2
+from serial.serialutil import SerialException
 
 ser = serial.Serial()
 ser.port = '/dev/ttyACM0'
@@ -21,8 +19,8 @@ def sign(n):
 
 
 def callback(data):
-    x = data.axes[0]
-    y = data.axes[1]
+    x = data.x
+    y = data.y
     d = 0.2
     mc = 9
     if -d < x < d and -d < y < d:
@@ -85,7 +83,7 @@ def listener():
         except SerialException:
             rospy.loginfo("Could not open {}. Trying again in {} seconds.".format(ser.port, reconnect_time))
             time.sleep(reconnect_time)
-    rospy.Subscriber('cassiopeia/input/joy', Joy, callback)
+    rospy.Subscriber('cassiopeia/control/direction', Vector2, callback)
     rospy.spin()
 
 
